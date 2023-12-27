@@ -1,0 +1,16 @@
+if params.len != 1 or params[0] == "-h" or params[0] == "--help" then exit("<b>Usage: "+program_path.split("/")[-1]+" [PROGRAM]</b>")
+
+source = params[0]
+
+import_code("/home/Snetrz/source/lib/abspath")
+import_code("/home/Snetrz/source/lib/basename")
+
+source_file = get_shell.host_computer.File(abspath(source))
+if source_file == null then
+	exit("Argument is not a file")
+else if source_file.has_permission("x") == false then
+	exit("Argument is not executable")
+end if
+
+source_file.move("/bin", basename(source))
+

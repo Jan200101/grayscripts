@@ -1,0 +1,12 @@
+if params.len != 2 or params[0] == "-h" or params[0] == "--help" then exit("<b>Usage: "+program_path.split("/")[-1]+" [SRC] [DEST]</b>")
+
+source = params[0]
+dest = params[1]
+
+import_code("/home/Snetrz/source/lib/abspath")
+import_code("/home/Snetrz/source/lib/dirname")
+import_code("/home/Snetrz/source/lib/basename")
+
+source_file = get_shell.host_computer.File(abspath(source))
+source_file.move(dirname(abspath(dest)), basename(dest))
+

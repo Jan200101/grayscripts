@@ -1,0 +1,15 @@
+import_code("/home/Snetrz/source/lib/pathsep")
+
+dirname = function(path)
+    l = path.len
+    if path[l-1] == PATHSEP then
+        return path
+    end if
+
+    for i in range(l-2, 0)
+        if path[i] == PATHSEP then
+            return path[0:i]
+        end if
+    end for
+    return path
+end function

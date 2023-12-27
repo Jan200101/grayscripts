@@ -1,0 +1,11 @@
+import_code("/home/Snetrz/source/lib/pathsep")
+
+basename = function(path)
+    l = path.len
+    for i in range(l-1, 0)
+        if path[i] == PATHSEP then
+            return path[i+1:l]
+        end if
+    end for
+    return path
+end function

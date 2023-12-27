@@ -1,0 +1,6 @@
+import_code("/home/Snetrz/source/lib/pathsep")
+
+abspath = function(path)
+    if path[0] == PATHSEP then return path
+    return current_path + PATHSEP + path
+end function
