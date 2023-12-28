@@ -40,7 +40,6 @@ res = shell.build(src_path, dirname(bin_path))
 if res != "" then
 	exit("[!] build failure: " + res)
 end if
-
-//src_file.delete
+src_file.delete
 
 computer.File(bin_path).move(dirname(output), basename(output))
