@@ -1,0 +1,67 @@
+// resimp.src
+
+IMPORTCODELIT = "import_code"+"("
+
+resolve_import = function(code)
+	import_index = code.indexOf(IMPORTCODELIT)
+	// Resolve source code imports
+	while import_index != null
+		start_quote = code.indexOf("""", import_index + 1)
+		if start_quote == null then exit("could not find import_code string")
+		end_quote = code.indexOf("""", start_quote + 1)
+		if end_quote == null then exit("could not find end of import_code string")
+		import_end = code.indexOf(")", end_quote)
+		if import_end == null then exit("could not find end of import_code")
+
+		import_name = code[start_quote+1:end_quote]
+		import_file = computer.File(import_name)
+	
+		if import_file == null then
+			print(import_index)
+			exit("error: " + import_name + " not found (found at " + start_quote + ")")
+		else if import_file.is_binary then
+			// skip binary imports for now
+			import_index = import_end + 1
+		else
+			imp_code = code[import_index:import_end+1]
+			rep_code = import_file.get_content
+		
+			start_comment = "// start " + import_name + char(10)
+			end_comment = "// end " + import_name + char(10)
+			code = code[0:import_index] + start_comment + rep_code + end_comment + code[import_end+1:code.len]
+		end if
+		// find next index
+		import_index = code.indexOf(IMPORTCODELIT, import_index-1)
+	end while
+
+	// deduplicate binary imports
+	import_index = code.indexOf(IMPORTCODELIT)
+	while import_index != null
+		start_quote = code.indexOf("""", import_index + 1)
+		if start_quote == null then exit("could not find import_code string")
+		end_quote = code.indexOf("""", start_quote + 1)
+		if end_quote == null then exit("could not find end of import_code string")
+		import_end = code.indexOf(")", end_quote)
+		if import_end == null then exit("could not find end of import_code")
+
+		import_name = code[start_quote+1:end_quote]
+		import_file = computer.File(import_name)
+	
+		if import_file.is_binary == false then
+			exit("how did we get here")
+		end if
+	
+		import_seg = code[import_index:import_end+1]
+		
+		dup_index = code.indexOf(import_seg, import_end+1)
+		while dup_index != null
+			code = code[0:dup_index] + code[dup_index+import_seg.len:code.len]
+			dup_index = code.indexOf(import_seg, dup_index)
+		end while
+
+		// find next index
+		import_index = code.indexOf(IMPORTCODELIT, import_end)
+	end while
+
+	return code
+end function

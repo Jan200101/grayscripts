@@ -1,11 +1,12 @@
 // unity.src
-// finds and replaces every import_code found with the contents of the import if possible
+// finds and replaces every import code found with the contents of the import if possible
 if params.len != 1 or params[0] == "-h" or params[0] == "--help" then exit("<b>Usage: "+program_path.split("/")[-1]+" [CODE]</b>")
 
 shell = get_shell
 computer = shell.host_computer
 
-import_code("/home/Snetrz/source/lib/abspath")
+import_code("/home/Snetrz/source/lib-src/abspath.src")
+import_code("/home/Snetrz/source/lib-src/resimp.src")
 
 filename = abspath(params[0])
 fd = computer.File(abspath(filename))
@@ -14,32 +15,4 @@ if fd == null then
 	exit("File not found")
 end if
 
-code = fd.get_content
-
-import_index = code.indexOf("import_code")
-while import_index != null
-	start_quote = code.indexOf("""", import_index + 1)
-	if start_quote == null then exit("could not find import_code string")
-	end_quote = code.indexOf("""", start_quote + 1)
-	if end_quote == null then exit("could not find end of import_code string")
-	import_end = code.indexOf(")", end_quote)
-	if import_end == null then exit("could not find end of import_code")
-
-	import_name = code[start_quote+1:end_quote]
-	import_file = computer.File(import_name)
-	
-	if import_file.is_binary then
-		// Oh well, nothing we can do
-		import_index = import_end + 1
-	else
-		imp_code = code[import_index:import_end+1]
-		rep_code = import_file.get_content
-		
-		code = code[0:import_index] + rep_code + code[import_end+1:code.len-1]
-	end if
-	// find next index
-	import_index = code.indexOf("import_code", import_index-1)
-end while
-
-print(code)
-
+print(resolve_import(fd.get_content))

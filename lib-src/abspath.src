@@ -1,4 +1,4 @@
-import_code("/home/Snetrz/source/lib/pathsep")
+import_code("/home/Snetrz/source/lib-src/pathsep.src")
 
 abspath = function(path)
     if path[0] == PATHSEP then return path

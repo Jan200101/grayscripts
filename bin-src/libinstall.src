@@ -8,8 +8,6 @@ import_code("/home/Snetrz/source/lib-src/basename.src")
 source_file = get_shell.host_computer.File(abspath(source))
 if source_file == null then
 	exit("Argument is not a file")
-else if source_file.has_permission("x") == false then
-	exit("Argument is not executable")
 end if
 
-source_file.move("/bin", basename(source))
+source_file.move("/lib", basename(source))

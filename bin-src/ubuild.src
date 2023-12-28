@@ -1,0 +1,46 @@
+// ubuild.src
+if params.len != 2 or params[0] == "-h" or params[0] == "--help" then exit("<b>Usage: "+program_path.split("/")[-1]+" [CODE] [OUT]</b>")
+
+shell = get_shell
+computer = shell.host_computer
+
+import_code("/home/Snetrz/source/lib-src/pathsep.src")
+import_code("/home/Snetrz/source/lib-src/abspath.src")
+import_code("/home/Snetrz/source/lib-src/dirname.src")
+import_code("/home/Snetrz/source/lib-src/basename.src")
+import_code("/home/Snetrz/source/lib-src/resimp.src")
+import_code("/home/Snetrz/source/lib-src/mktemp.src")
+
+filename = abspath(params[0])
+output = abspath(params[1])
+
+fd = computer.File(abspath(filename))
+
+if fd == null then
+	exit("[!] File not found")
+end if
+
+print("[*] Resolving imports")
+code = resolve_import(fd.get_content)
+
+print("[*] Creating source bundle")
+src_file = computer.File(mktemp("ubuild"))
+bin_path = src_file.path
+src_path = src_file.path + ".src"
+src_file.set_content(code)
+res = src_file.rename(basename(src_path))
+if res != "" then
+	src_file.delete
+	exit("[!] failed to created source bundle: " + res)
+end if
+src_file = computer.File(src_path)
+
+print("[*] Building bundle")
+res = shell.build(src_path, dirname(bin_path))
+if res != "" then
+	exit("[!] build failure: " + res)
+end if
+
+//src_file.delete
+
+computer.File(bin_path).move(dirname(output), basename(output))
