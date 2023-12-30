@@ -1,0 +1,143 @@
+// argparse.src
+
+ArgumentParser = {
+	"classID": "ArgumentParser",
+	"arguments": {},
+}
+
+
+//	aname
+//		description:
+//			contains the argument name
+//		type: string
+//	
+//	long
+//		description:
+//			if the argument should be the full name or a single letter
+//			also defines if one or two dashes will be used
+//		type: number
+//		default: false
+//	
+//	action
+//		description:
+//			defines how the arguments will be handled.
+//		type: string
+//		values:
+//			store
+//				stores the next argument
+//			flag
+//				stores True if the flag was found, False otherwise
+//		default: "store"
+// 
+ArgumentParser.add_argument = function(aname, long=false, action="store")
+	if typeof(aname) != "string" then exit("add_argument: invalid aname type")
+	if typeof(long) != "number" then exit("add_argument: invalid long type")
+	if typeof(action) != "string" then exit("add_argument: invalid action type")
+	if ["store", "flag"].indexOf(action) == null then exit("add_argument: invalid action value")
+
+	if long then
+		flag = "--"+aname
+	else
+		flag = "-"+aname[0]
+	end if
+	
+	// check for duplicate flags
+	if self.arguments.hasIndex(flag) then
+		exit("add_argument: duplicate flag '" + aname + "'")
+	end if
+	
+
+	self.arguments[flag] = {
+		"aname": aname,
+		"long": long,
+		"action": action,
+	}
+end function
+
+ArgumentParser.parse_args = function(args)
+
+	parsedargs = {}
+	
+	for a in self.arguments.indexes
+		k = self.arguments[a]
+		
+		n = k["aname"]
+		v = {
+			"store": "",
+			"flag": false,
+		}[k["action"]]
+		
+		parsedargs[n] = v
+	end for
+
+	i = 0
+	while i < args.len
+		a = args[i]
+		if a == "--help" then exit(self.print_help)
+		
+		// Ain't a flag, we are done here
+		if a[0] != "-" then break
+		
+		if self.arguments.hasIndex(a) == false then
+			exit("<b>error</b>: unknown flag: '" + a + "'")
+		end if
+	
+		k = self.arguments[a]
+		n = k["aname"]
+
+		if k["action"] == "store" then
+			i = i + 1
+			if args.len <= i then exit("no parameter for flag '" + a + "' found")
+			v = args[i]
+		else if k["action"] == "flag" then
+			v = true
+		else
+			exit("found invalid action: "+ k["action"])	
+		end if
+		parsedargs[n] = v
+		
+		i = i + 1
+	end while
+
+	parsedargs.rest = args[i:args.len]
+	return parsedargs
+end function
+
+ArgumentParser.print_help = function()
+	program_name = program_path.split("/")[-1]
+	usage_start = "Usage: " + program_name
+	
+	short_flags = []
+	long_flags = []
+	stores = []
+	for k in self.arguments.indexes
+		a = self.arguments[k]
+		if a["action"] == "flag" then
+			if a["long"] == true then
+				long_flags.push(k)
+			else
+				short_flags.push(a["aname"][0])
+			end if
+		else if a["action"] == "store" then
+			stores.push([a["aname"], k])
+		else
+			exit("print_help: invalid action found")
+		end if
+	end for
+	
+	flag_usage = ""
+	if short_flags.len != 0 then
+		flag_usage = flag_usage + " [-" + short_flags.join("") + "]"
+	end if
+	for f in long_flags
+		flag_usage = flag_usage + " [" + f + "]"
+	end for
+	
+	store_usage = ""
+	for s in stores
+		store_usage = store_usage + " [" + s[1] + " " + s[0] + "]"
+	end for
+
+	usage = "<b>" + usage_start + flag_usage + store_usage + "</b>"
+	print(usage)
+end function
