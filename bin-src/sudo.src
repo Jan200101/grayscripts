@@ -1,0 +1,36 @@
+// sudo.src
+import_code("/home/Snetrz/source/lib-src/abspath.src")
+import_code("/home/Snetrz/source/lib-src/argparse.src")
+
+parser = new ArgumentParser
+parser.add_argument("super", false, "flag")
+parser.add_argument("username", false, "store")
+
+args = parser.parse_args(params)
+
+user = args["username"]
+if user == "" or args["super"] == true then user = "root"
+
+pass = user_input("Password: ", true)
+shell = get_shell(user, pass)
+computer = shell.host_computer
+
+rest = args["rest"]
+if rest.len == 0 then
+	shell.start_terminal
+end if
+
+program = abspath(rest[0])
+if computer.File(program) == null then 
+	program = "/usr/bin/" + rest[0]
+	if computer.File(program) == null then 
+		program = "/bin/" + rest[0]
+		if computer.File(program) == null then 
+			program = rest[0]
+		end if
+	end if
+end if
+
+params = rest[1:rest.len].join(" ")
+
+shell.launch(program, params)
