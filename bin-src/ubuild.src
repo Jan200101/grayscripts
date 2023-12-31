@@ -21,10 +21,10 @@ if fd == null then
 end if
 
 print("[*] Resolving imports")
-code = resolve_import(fd.get_content)
+code = resolve_import(computer, fd.get_content)
 
 print("[*] Creating source bundle")
-src_file = computer.File(mktemp("ubuild"))
+src_file = computer.File(mktemp(computer, "ubuild"))
 bin_path = src_file.path
 src_path = src_file.path + ".src"
 src_file.set_content(code)

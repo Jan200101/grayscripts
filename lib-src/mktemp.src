@@ -3,13 +3,11 @@
 import_code("/home/Snetrz/source/lib-src/getpid.src")
 import_code("/home/Snetrz/source/lib-src/pathsep.src")
 
-computer = get_shell.host_computer
+mktemp = function(comp, template)
+	if template == null then exit("mktemp: no template specified")
+	filename = ".tmp." + template + getpid(comp)
 
-mktemp = function(template)
-    if template == null then exit("mktemp: no template specified")
-	filename = ".tmp." + template + getpid
-	
-	res = computer.touch(home_dir, filename)
+	res = comp.touch(home_dir, filename)
 	if typeof(res) == "string" then
 		print("mktemp: error " + res)
 	end if

@@ -17,7 +17,7 @@ if fd == null then
 	exit("File not found")
 end if
 
-code = resolve_import(fd.get_content)
+code = resolve_import(computer, fd.get_content)
 if params.len == 2 then
 	output = abspath(params[1])
 	computer.touch(dirname(output), basename(output))

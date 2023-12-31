@@ -1,9 +1,7 @@
 // getpid.src
 
-computer = get_shell.host_computer
-
-getpid = function() 
-	procs = computer.show_procs
+getpid = function(comp) 
+	procs = comp.show_procs
 	list = procs.split(char(10))[1:]
 	
 	for item in list
