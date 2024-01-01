@@ -1,0 +1,13 @@
+// ver.src
+if params.len == 0 or params[0] == "-h" or params[0] == "--help" then exit("<b>Usage: "+program_path.split("/")[-1]+" [LIB...]</b>")
+
+import_code("/home/Snetrz/source/lib-src/abspath.src")
+import_code("/home/Snetrz/source/lib-src/basename.src")
+import_code("/home/Snetrz/source/lib-src/meta.src")
+
+metax = load_meta
+
+for p in params
+	lib = metax.load(abspath(p))
+	print(basename(p) + ": " + lib.version)
+end for
