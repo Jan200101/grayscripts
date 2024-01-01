@@ -9,7 +9,8 @@ parser.add_argument("username", false, "store")
 args = parser.parse_args(params)
 
 user = args["username"]
-if user == "" or args["super"] == true then user = "root"
+if args["super"] == true then user = "root"
+if user == "" then exit(parser.print_help)
 
 pass = user_input("Password: ", true)
 shell = get_shell(user, pass)
@@ -20,17 +21,20 @@ if rest.len == 0 then
 	shell.start_terminal
 end if
 
-program = abspath(rest[0])
-if computer.File(program) == null then 
-	program = "/usr/bin/" + rest[0]
-	if computer.File(program) == null then 
-		program = "/bin/" + rest[0]
-		if computer.File(program) == null then 
-			program = rest[0]
-		end if
-	end if
-end if
+find_executable = function(comp, execname)
+	program = abspath(execname)
+	if comp.File(program) != null then return program
+	
+	program = "/usr/bin/" + execname
+	if comp.File(program) != null then return program
+		
+	program = "/bin/" + execname
+	if comp.File(program) != null then return program
+	
+	return execname
+end function
 
+program = find_executable(computer, rest[0])
 params = rest[1:rest.len].join(" ")
 
 shell.launch(program, params)
