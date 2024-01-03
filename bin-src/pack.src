@@ -1,0 +1,84 @@
+// pack.src
+// NAME!BASE64
+
+shell = get_shell
+computer = shell.host_computer
+
+import_code("../lib-src/libbase64.src")
+import_code("../lib-src/argparse.src")
+import_code("../lib-src/basename.src")
+import_code("../lib-src/dirname.src")
+import_code("../lib-src/abspath.src")
+import_code("../lib-src/pathsep.src")
+
+parser = new ArgumentParser
+parser.add_argument("pack", false, "flag")
+parser.add_argument("unpack", false, "flag")
+
+args = parser.parse_args(params)
+
+if args["pack"] == args["unpack"] then
+	exit("[!] Either -p or -u must be specified")
+end if
+
+filepath = args["rest"].join(" ")
+outname = basename(filepath) + ".pack"
+
+fd = computer.File(abspath(filepath))
+
+if fd == null then
+	exit("pack: " + filepath + " is not a file or directory")
+end if
+
+pack = function(file)
+	if file.is_folder then
+		d = ""
+		for f in file.get_folders
+			d = d + pack(f)
+		end for
+		
+		for f in file.get_files
+			d = d + pack(f)
+		end for
+		
+		return d
+	else if file.is_binary then
+		print("[!] Skipping binary file " + basename(file.path))
+		return ""
+	end if
+	
+	c = current_path
+	p = file.path
+	if p[0:c.len] == c then
+		p = p[c.len+1:p.len]
+	end if
+
+	print("[*] Processing " + p)
+
+	d = base64.encode(file.get_content)
+	
+	return p + "!" + d + char(10)
+end function
+
+if args["pack"] then
+	outpath = current_path + PATHSEP + basename(outname)
+	if computer.File(outpath) != null then
+		exit("pack: output file already exists (" + outpath + ")")
+	end if
+
+	print("[*] Packing...")
+	d = pack(fd)
+
+	res = computer.touch(dirname(outpath), basename(outpath))
+	if typeof(res) == "string" then
+		exit("pack: touch error: " + res)
+	end if
+
+	outfile = computer.File(outpath)
+	outfile.set_content(d)
+	
+	print("[*] Created pack file " + outpath)
+else if args["unpack"] then
+	
+end if
+
