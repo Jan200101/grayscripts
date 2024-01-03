@@ -1,0 +1,27 @@
+// base64.src
+
+import_code("../lib-src/libbase64.src")
+import_code("../lib-src/argparse.src")
+
+parser = new ArgumentParser
+parser.add_argument("file", false, "flag")
+parser.add_argument("decode", false, "flag")
+
+args = parser.parse_args(params)
+
+data = args["rest"].join(" ")
+if args["file"] then
+	fd = get_shell.host_computer.File(abspath(data))
+	if fd == null or fd.is_binary then
+		exit("base64: " + data + " is not a valid file")
+	end if
+	data = fd.get_content
+end if
+
+if args["decode"] then
+	o = base64.decode(data)
+else
+	o = base64.encode(data)
+end if
+
+print(o)
