@@ -9,5 +9,10 @@ metax = load_meta
 
 for p in params
 	lib = metax.load(abspath(p))
-	print(basename(p) + ": " + lib.version)
+	if lib == null then
+		print(basename(p)+ ": not a libary")
+	else
+		print(basename(p) + ": " + lib.version)
+	end if
+	
 end for
