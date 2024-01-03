@@ -1,0 +1,128 @@
+// libbase64.src
+// based on https://github.com/iskolbin/lbase64
+// MIT License
+// Copyright (c) 2018 Ilya Kolbin
+// Permission is hereby granted, free of charge, to any person obtaining a copy of
+// this software and associated documentation files (the "Software"), to deal in
+// the Software without restriction, including without limitation the rights to
+// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+// of the Software, and to permit persons to whom the Software is furnished to do
+// so, subject to the following conditions:
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+import_code("../lib-src/assert.src")
+
+base64 = {}
+
+base64._table = [
+	"A","B","C","D","E","F","G","H","I","J","K","L","M",
+	"N","O","P","Q","R","S","T","U","V","W","X","Y","Z",
+	"a","b","c","d","e","f","g","h","i","j","k","l","m",
+	"n","o","p","q","r","s","t","u","v","w","x","y","z",
+	"0","1","2","3","4","5","6","7","8","9","+","/","=",
+]
+
+base64._extract = function( v, from, width )
+	w = 0
+	flag = 2^from
+	
+	i = 0
+	while i < width
+		flag2 = flag + flag
+		if v % flag2 >= flag then
+			w = w + 2^i
+		end if
+		flag = flag2
+		i = i + 1
+	end while
+	return w
+end function
+		
+base64.encode = function(str)
+	t = []
+	k = 0
+	n = str.len
+	lastn = n % 3
+	
+	i = 0
+	while i < n-lastn
+		a = str[i+0].code
+		b = str[i+1].code
+		c = str[i+2].code
+		v = a*65536 + b*256 + c
+		t.push(self._table[self._extract(v,18,6)] + self._table[self._extract(v,12,6)] + self._table[self._extract(v,6,6)] + self._table[self._extract(v,0,6)])
+		i = i + 3
+	end while
+	
+	if lastn == 2 then
+		a = str[n-2].code
+		b = str[n-1].code
+		v = a*65536 + b*256
+		s = self._table[self._extract(v,18,6)] + self._table[self._extract(v,12,6)] + self._table[self._extract(v,6,6)] + self._table[64]
+		t.push(s)
+	else if lastn == 1 then
+		a = str[n-1].code
+		v = a*65536
+		s = self._table[self._extract(v,18,6)] + self._table[self._extract(v,12,6)] + self._table[64] + self._table[64]
+		t.push(s)
+	end if
+	return t.join("")
+end function
+
+base64.decode = function(data)
+	t = []
+	k = 0
+	n = data.len
+
+	if data[-2:data.len] == "==" then
+		padding = 2
+	else if data[-1:data.len] == "=" then
+		padding = 1
+	else
+		padding = 0
+	end if
+
+	l = n
+	if padding > 0 then l = n - 4
+
+	i = 0
+	while i < l
+		a = data[i+0]
+		b = data[i+1]
+		c = data[i+2]
+		d = data[i+3]
+		v = self._table.indexOf(a)*262144 + self._table.indexOf(b)*4096 + self._table.indexOf(c)*64 + self._table.indexOf(d)
+		s = char(self._extract(v,16,8)) + char(self._extract(v,8,8)) + char(self._extract(v,0,8))
+		t.push(s)
+		i = i + 4
+	end while
+	if padding == 1 then
+		a = data[n-4]
+		b = data[n-3]
+		c = data[n-2]
+		v = self._table.indexOf(a)*262144 + self._table.indexOf(b)*4086 + self._table.indexOf(c)*64
+		s = char(self._extract(v,16,8)) + char(self._extract(v,8,8))
+		t.push(s)
+	else if padding == 2 then
+		a = data[n-4]
+		b = data[n-3]
+		v = self._table.indexOf(a)*262144 + self._table.indexOf(b)*4086
+		s = char(self._extract(v,16,8))
+		t.push(s)
+	end if
+	
+	return t.join("")
+end function
+
+assert(base64.encode("test") == "dGVzdA==", "base64 encoder broke")
+assert(base64.decode("dGVzdA==") == "test", "base64 decoder broke")
+assert(base64.decode(base64.encode("test")) == "test", "base64 round trip broke")
+
