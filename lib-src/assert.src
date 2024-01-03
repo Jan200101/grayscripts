@@ -1,0 +1,7 @@
+// assert.src
+
+assert = function(cond, msg)
+	if cond == false then
+		exit("assert: " + msg)
+	end if
+end function
