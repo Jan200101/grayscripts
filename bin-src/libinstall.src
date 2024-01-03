@@ -2,8 +2,8 @@ if params.len != 1 or params[0] == "-h" or params[0] == "--help" then exit("<b>U
 
 source = params[0]
 
-import_code("/home/Snetrz/source/lib-src/abspath.src")
-import_code("/home/Snetrz/source/lib-src/basename.src")
+import_code("../lib-src/abspath.src")
+import_code("../lib-src/basename.src")
 
 root_shell = get_shell("root", user_input("Password: ", true))
 source_file = root_shell.host_computer.File(abspath(source))

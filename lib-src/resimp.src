@@ -1,6 +1,9 @@
 // resimp.src
 
-resolve_import = function(comp, code)
+import_code("/home/Snetrz/source/lib-src/abspath.src")
+
+resolve_import = function(comp, code, cwd=null)
+	if cwd == null then cwd = current_path
 	IMPORTCODELIT = "import_code"+"("
 
 	import_index = code.indexOf(IMPORTCODELIT)
@@ -32,7 +35,7 @@ resolve_import = function(comp, code)
 		if import_end == null then exit("could not find end of import_code")
 
 		import_name = code[start_quote+1:end_quote]
-		import_file = comp.File(import_name)
+		import_file = comp.File(abspath(import_name, cwd))
 	
 		if import_file == null then
 			exit("error: " + import_name + " not found")

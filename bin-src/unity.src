@@ -5,10 +5,10 @@ if (params.len == 1 or params.len == 2) != true or params[0] == "-h" or params[0
 shell = get_shell
 computer = shell.host_computer
 
-import_code("/home/Snetrz/source/lib-src/abspath.src")
-import_code("/home/Snetrz/source/lib-src/dirname.src")
-import_code("/home/Snetrz/source/lib-src/basename.src")
-import_code("/home/Snetrz/source/lib-src/resimp.src")
+import_code("../lib-src/abspath.src")
+import_code("../lib-src/dirname.src")
+import_code("../lib-src/basename.src")
+import_code("../lib-src/resimp.src")
 
 filename = abspath(params[0])
 fd = computer.File(abspath(filename))
@@ -17,7 +17,7 @@ if fd == null then
 	exit("File not found")
 end if
 
-code = resolve_import(computer, fd.get_content)
+code = resolve_import(computer, fd.get_content, dirname(filename))
 if params.len == 2 then
 	output = abspath(params[1])
 	computer.touch(dirname(output), basename(output))

@@ -1,6 +1,6 @@
 // sudo.src
-import_code("/home/Snetrz/source/lib-src/abspath.src")
-import_code("/home/Snetrz/source/lib-src/argparse.src")
+import_code("../lib-src/abspath.src")
+import_code("../lib-src/argparse.src")
 
 parser = new ArgumentParser
 parser.add_argument("super", false, "flag")
@@ -10,6 +10,7 @@ args = parser.parse_args(params)
 
 user = args["username"]
 if args["super"] == true then user = "root"
+
 if user == "" then exit(parser.print_help)
 
 pass = user_input("Password: ", true)

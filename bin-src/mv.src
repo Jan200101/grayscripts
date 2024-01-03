@@ -4,10 +4,9 @@ if params.len != 2 or params[0] == "-h" or params[0] == "--help" then exit("<b>U
 source = params[0]
 dest = params[1]
 
-import_code("/home/Snetrz/source/lib-src/abspath.src")
-import_code("/home/Snetrz/source/lib-src/dirname.src")
-import_code("/home/Snetrz/source/lib-src/basename.src")
+import_code("../lib-src/abspath.src")
+import_code("../lib-src/dirname.src")
+import_code("../lib-src/basename.src")
 
 source_file = get_shell.host_computer.File(abspath(source))
 source_file.move(dirname(abspath(dest)), basename(dest))
-
