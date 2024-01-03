@@ -1,0 +1,12 @@
+
+bold = function(inp)
+	return "<b>"+inp+"</b>"
+end function
+
+italic = function(inp)
+	return "<i>"+inp+"</i>"
+end function
+
+color = function(inp, color)
+	return "<color="+color + ">"+inp+"</color>"
+end function
