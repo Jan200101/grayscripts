@@ -1,6 +1,23 @@
 import_code("/home/Snetrz/source/lib-src/pathsep.src")
 
-abspath = function(path)
-    if path[0] == PATHSEP then return path
-    return current_path + PATHSEP + path
+abspath = function(path, cwd = null)
+	if cwd == null then cwd = current_path
+    if path[0] != PATHSEP then path = cwd + PATHSEP + path
+    
+	pathseg = path.split(PATHSEP)
+	i = 0
+	while i < pathseg.len
+		if pathseg[i] == "." then
+			pathseg.remove(i)
+			continue
+		else if pathseg[i] == ".." then
+			pathseg.remove(i)
+			pathseg.remove(i-1)
+			i = i - 1
+			continue
+		end if
+		i = i + 1
+	end while
+
+	return pathseg.join(PATHSEP)
 end function
