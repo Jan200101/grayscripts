@@ -1,8 +1,9 @@
 
-load_meta = function() 
+load_meta = function(cwd=null)
+	if cwd == null then cwd = current_path
 	metaxploit = include_lib("/lib/metaxploit.so")
 	if not metaxploit then
-		metaxploit = include_lib(current_path + "/metaxploit.so")
+		metaxploit = include_lib(cwd + "/metaxploit.so")
 	end if
 	if not metaxploit then exit("Error: Can't find metaxploit library in the /lib path or the current folder")
 	return metaxploit
