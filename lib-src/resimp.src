@@ -1,6 +1,8 @@
 // resimp.src
 
-import_code("/home/Snetrz/source/lib-src/abspath.src")
+import_code("abspath.src")
+
+_dedup_list = []
 
 resolve_import = function(comp, code, cwd=null)
 	if cwd == null then cwd = current_path
@@ -36,7 +38,7 @@ resolve_import = function(comp, code, cwd=null)
 
 		import_name = code[start_quote+1:end_quote]
 		import_file = comp.File(abspath(import_name, cwd))
-	
+
 		if import_file == null then
 			exit("error: " + import_name + " not found")
 		else if import_file.is_binary then
@@ -44,8 +46,9 @@ resolve_import = function(comp, code, cwd=null)
 			import_index = import_end + 1
 		else
 			imp_code = code[import_index:import_end+1]
-			rep_code = import_file.get_content
-		
+
+			rep_code = resolve_import(comp, import_file.get_content, dirname(import_file.path))
+
 			start_comment = "// start " + import_name + char(10)
 			end_comment = "// end " + import_name + char(10)
 			code = code[0:import_index] + start_comment + rep_code + end_comment + code[import_end+1:code.len]
@@ -73,13 +76,13 @@ resolve_import = function(comp, code, cwd=null)
 
 		import_name = code[start_quote+1:end_quote]
 		import_file = comp.File(import_name)
-	
+
 		if import_file.is_binary == false then
 			exit("found a source import while trying to dedup")
 		end if
-	
+
 		import_seg = code[import_index:import_end+1]
-		
+
 		dup_index = code.indexOf(import_seg, import_end+1)
 		while dup_index != null
 			code = code[0:dup_index] + code[dup_index+import_seg.len:code.len]

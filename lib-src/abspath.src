@@ -1,4 +1,4 @@
-import_code("/home/Snetrz/source/lib-src/pathsep.src")
+import_code("pathsep.src")
 
 abspath = function(path, cwd = null)
 	if cwd == null then cwd = current_path

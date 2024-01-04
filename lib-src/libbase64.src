@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import_code("../lib-src/assert.src")
+import_code("assert.src")
 
 base64 = {}
 

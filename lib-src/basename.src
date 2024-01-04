@@ -1,4 +1,4 @@
-import_code("/home/Snetrz/source/lib-src/pathsep.src")
+import_code("pathsep.src")
 
 basename = function(path)
     l = path.len

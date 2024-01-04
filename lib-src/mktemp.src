@@ -1,7 +1,7 @@
 // mktemp.src
 
-import_code("/home/Snetrz/source/lib-src/getpid.src")
-import_code("/home/Snetrz/source/lib-src/pathsep.src")
+import_code("getpid.src")
+import_code("pathsep.src")
 
 mktemp = function(comp, template)
 	if template == null then exit("mktemp: no template specified")
