@@ -5,8 +5,9 @@ import base64
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-u', '--unpack', action='store_true') 
-parser.add_argument('-p', '--pack', action='store_true') 
+parser.add_argument('-u', '--unpack', action='store_true')
+parser.add_argument('-p', '--pack', action='store_true')
+parser.add_argument('-f', '--force', action='store_true')
 parser.add_argument('file', type=argparse.FileType("r"))
 
 args = parser.parse_args()
@@ -16,6 +17,9 @@ if args.pack == args.unpack:
     exit(0)
 
 def confirm(msg):
+    if args.force:
+        return True
+
     while True:
         d = input(msg)
         m = {
