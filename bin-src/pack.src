@@ -10,19 +10,21 @@ import_code("../lib-src/basename.src")
 import_code("../lib-src/dirname.src")
 import_code("../lib-src/abspath.src")
 import_code("../lib-src/pathsep.src")
+import_code("../lib-src/mkdir.src")
 
 parser = new ArgumentParser
 parser.add_argument("pack", false, "flag")
 parser.add_argument("unpack", false, "flag")
+parser.add_argument("force", false, "flag")
 
 args = parser.parse_args(params)
 
 if args["pack"] == args["unpack"] then
-	exit("[!] Either -p or -u must be specified")
+	parser.print_help
+	exit("[!] Either -p(ack) or -u(npack) needs to be specified")
 end if
 
 filepath = args["rest"].join(" ")
-outname = basename(filepath) + ".pack"
 
 fd = computer.File(abspath(filepath))
 
@@ -60,7 +62,64 @@ pack = function(file)
 	return p + "!" + d + char(10)
 end function
 
+unpack = function(file)
+	if file.is_folder or file.is_binary then
+		exit("Cannot unpack folders or binary files")
+	end if
+
+	content = file.get_content
+	lines = content.split(char(10))
+	for i in lines.indexes
+		line = lines[i]
+		if line.len == 0 then continue
+
+		segments = line.split("!")
+		if segments.len != 2 then exit("[!] found corrupt segment " + i)
+		path = segments[0]
+		data = base64.decode(segments[1])
+
+		f = computer.File(path)
+		if f != null then
+			if f.is_folder or f.is_binary then
+				exit("[!] " + path + " already exists and is not a file")
+			end if
+			
+			r = null
+			a = {
+				"y": true,
+				"yes": true,
+				"n": false,
+				"no": false,
+			}
+			
+			while a.indexOf(r) == null
+				a = user_input("[?] " + path + " already exists. replace? [y/n]")
+			end while
+		
+			if a[r] == true then
+				print("[*] Skipping " + path)
+				continue
+			end if
+		else
+			d = abspath(dirname(path))
+			b = basename(path)
+			
+			mkdir(computer, d)
+			res = computer.touch(d, b)
+			if typeof(res) == "string" then
+				error("[!] failed to create file '" + path + "': " + res)
+			end if
+
+			f = computer.File(path)
+		end if
+		
+        print("[*] Unpacking " + path)
+		f.set_content(data)
+	end for
+end function
+
 if args["pack"] then
+	outname = basename(filepath) + ".pack"
 	outpath = current_path + PATHSEP + basename(outname)
 	if computer.File(outpath) != null then
 		exit("pack: output file already exists (" + outpath + ")")
@@ -79,6 +138,6 @@ if args["pack"] then
 	
 	print("[*] Created pack file " + outpath)
 else if args["unpack"] then
-	
+	unpack(fd)
 end if
 
