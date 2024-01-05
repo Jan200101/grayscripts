@@ -108,13 +108,13 @@ base64.decode = function(data)
 		a = data[n-4]
 		b = data[n-3]
 		c = data[n-2]
-		v = self._table.indexOf(a)*262144 + self._table.indexOf(b)*4086 + self._table.indexOf(c)*64
+		v = self._table.indexOf(a)*262144 + self._table.indexOf(b)*4096 + self._table.indexOf(c)*64
 		s = char(self._extract(v,16,8)) + char(self._extract(v,8,8))
 		t.push(s)
 	else if padding == 2 then
 		a = data[n-4]
 		b = data[n-3]
-		v = self._table.indexOf(a)*262144 + self._table.indexOf(b)*4086
+		v = self._table.indexOf(a)*262144 + self._table.indexOf(b)*4096
 		s = char(self._extract(v,16,8))
 		t.push(s)
 	end if
@@ -124,5 +124,5 @@ end function
 
 assert(base64.encode("test") == "dGVzdA==", "base64 encoder broke")
 assert(base64.decode("dGVzdA==") == "test", "base64 decoder broke")
-assert(base64.decode(base64.encode("test")) == "test", "base64 round trip broke")
-
+assert(base64.decode(base64.encode("test")) == "test", "base64 round trip broke 1")
+assert(base64.decode(base64.encode("reallylongstring")) == "reallylongstring", "base64 round trip broke 2")
