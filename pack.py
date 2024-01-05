@@ -40,7 +40,7 @@ def unpack(path):
 
             os.makedirs(os.path.dirname(p), exist_ok=True)
             if os.path.isfile(p) and not confirm(f"[!] {p} already exists, replace? [y/n]"):
-                print(f"[!] Skipping {p}")
+                print(f"[*] Skipping {p}")
                 continue
 
             with open(p, "wb") as fd:
