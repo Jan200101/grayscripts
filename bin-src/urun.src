@@ -1,0 +1,51 @@
+// urun.src
+if params.len < 1 or params[0] == "-h" or params[0] == "--help" then exit("<b>Usage: "+program_path.split("/")[-1]+" [CODE] (ARGS...)</b>")
+
+shell = get_shell
+computer = shell.host_computer
+
+import_code("../lib-src/pathsep.src")
+import_code("../lib-src/abspath.src")
+import_code("../lib-src/dirname.src")
+import_code("../lib-src/basename.src")
+import_code("../lib-src/resimp.src")
+import_code("../lib-src/mktemp.src")
+
+filename = abspath(params[0])
+
+fd = computer.File(abspath(filename))
+
+if fd == null then
+	exit("[!] File not found")
+end if
+
+print("[*] Resolving imports")
+code = resolve_import(computer, fd.get_content, dirname(filename))
+
+print("[*] Creating source bundle")
+src_file = computer.File(mktemp(computer, "urun"))
+bin_path = src_file.path
+src_path = src_file.path + ".src"
+src_file.set_content(code)
+res = src_file.rename(basename(src_path))
+if res != "" then
+	src_file.delete
+	exit("[!] failed to created source bundle: " + res)
+end if
+src_file = computer.File(src_path)
+
+print("[*] Building bundle")
+res = shell.build(src_path, dirname(bin_path))
+src_file.delete
+if res != "" then
+	exit("[!] build failure: " + res)
+end if
+
+bin_file = computer.File(bin_path)
+if bin_file == null then
+	exit("[!] binary is missing")
+end if
+
+shell.launch(bin_path, params[1:params.len].join(" "))
+
+bin_file.delete
