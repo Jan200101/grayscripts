@@ -1,5 +1,5 @@
-# GreyScripts
-for [Gray Hack](https://store.steampowered.com/app/605230/Grey_Hack/)
+# GrayScripts
+for [Grey Hack](https://store.steampowered.com/app/605230/Grey_Hack/)
 
 ## How to use
 all source code in this repo is intended to be compiled through ubuild which resolves multi-level imports ahead of time
