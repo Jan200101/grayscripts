@@ -1,0 +1,27 @@
+// mkdir.src
+import_code("../lib-src/pathsep.src")
+import_code("../lib-src/abspath.src")
+import_code("../lib-src/basename.src")
+import_code("../lib-src/dirname.src")
+
+mkdir = function(computer, path)
+	if computer == null or path == null then exit("mkdir: invalid arguments")
+	path = abspath(path)
+	
+	segs = path.split(PATHSEP)
+	for i in segs.indexes
+		if i == 0 then continue
+
+		p = segs[0:i+1].join(PATHSEP)
+		f = computer.File(p)
+		if f == null then
+			computer.create_folder(dirname(p), basename(p))
+		else if f.is_folder then
+			continue
+		else
+			exit("mkdir: failed to create folder, '" + p + "' is a file")
+		end if
+		
+	end for
+	
+end function
