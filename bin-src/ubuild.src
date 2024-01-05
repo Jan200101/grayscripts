@@ -37,9 +37,9 @@ src_file = computer.File(src_path)
 
 print("[*] Building bundle")
 res = shell.build(src_path, dirname(bin_path))
+src_file.delete
 if res != "" then
 	exit("[!] build failure: " + res)
 end if
-src_file.delete
 
 computer.File(bin_path).move(dirname(output), basename(output))
